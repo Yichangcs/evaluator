@@ -6,9 +6,8 @@ fn main() -> io::Result<()> {
 
     io::stdin().read_line(&mut line)?;
     
-    let mut iter = line.split_whitespace();
-
-    let mut cin = iter.next().unwrap();
+    let cins: Vec<String> = line.split_whitespace()
+                               .map(|s| s.to_string()).collect();
 
     Ok(())
 }
@@ -28,15 +27,15 @@ struct Token {
     value: f32,
 }
 
-struct CIN {
+struct Cin {
     index: usize,
     stream: String, 
 }
 
 
-impl CIN {
-    fn new(s: String) -> CIN {
-        CIN {
+impl Cin {
+    fn new(s: String) -> Cin {
+        Cin {
             index: 0,
             stream: s,
         }
@@ -83,3 +82,34 @@ impl Token {
         }
     }
 }
+
+
+#[cfg(test)]
+
+mod tests {
+    use super::*;
+
+    #[test]
+    fn it_works() {
+        assert_eq!(2+2, 4);
+    }
+    
+    #[test]
+    fn cin2val_works() {
+        let mut s1 = Cin::new(String::from("3.14+2.36)*2"));
+        
+        let mut s2 = Cin::new(String::from("3.14"));
+        
+        let mut s3 = Cin::new(String::from("3.14/(1+1.11)"));
+
+        let mut s4 = Cin::new(String::from("   3.14  /(1+1.11)"));
+
+        let mut s5 = Cin::new(String::from("3.14   +2.32)*2"));
+
+        assert_eq!(3.14, s1.cin2val());
+        assert_eq!(3.14, s2.cin2val());
+        assert_eq!(3.14, s3.cin2val());
+        //assert_eq!(3.14, s4.cin2val());
+        assert_eq!(3.14, s5.cin2val());
+        }
+    }
