@@ -6,10 +6,13 @@ fn main() -> io::Result<()> {
 
     io::stdin().read_line(&mut line)?;
     
-    let cins: Vec<String> = line.split_whitespace()
-                               .map(|s| s.to_string()).collect();
-
+    let v = string2vec(line);
     Ok(())
+}
+
+fn string2vec(line: String) -> Vec<String> {
+
+    line.split_whitespace().map(|s| s.to_string()).collect()
 }
 
 enum Op {
@@ -102,14 +105,22 @@ mod tests {
         
         let mut s3 = Cin::new(String::from("3.14/(1+1.11)"));
 
-        let mut s4 = Cin::new(String::from("   3.14  /(1+1.11)"));
+        let mut s4 = Cin::new(string2vec(String::from("   3.14  /(1+1.11)"))[0].clone());
 
         let mut s5 = Cin::new(String::from("3.14   +2.32)*2"));
 
         assert_eq!(3.14, s1.cin2val());
         assert_eq!(3.14, s2.cin2val());
         assert_eq!(3.14, s3.cin2val());
-        //assert_eq!(3.14, s4.cin2val());
+        assert_eq!(3.14, s4.cin2val());
         assert_eq!(3.14, s5.cin2val());
-        }
     }
+
+    #[test]
+    fn string2vec_works() {
+        let v = string2vec(String::from("    3.14   /(1+1.11)"));
+
+        assert_eq!(vec![String::from("3.14"), String::from("/(1+1.11)")], v);
+    }
+
+}
