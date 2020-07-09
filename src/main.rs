@@ -1,4 +1,5 @@
-use std::io;
+use std::io; 
+
 
 fn main() -> io::Result<()> {
 
@@ -6,13 +7,13 @@ fn main() -> io::Result<()> {
 
     io::stdin().read_line(&mut line)?;
     
-    let v = string2vec(line);
+    let v = string_concatenate(line);
     Ok(())
 }
 
-fn string2vec(line: String) -> Vec<String> {
-
-    line.split_whitespace().map(|s| s.to_string()).collect()
+fn string_concatenate(line: String) -> String {
+    let x: Vec<String> = line.split_whitespace().map(|s| s.to_string()).collect();
+    x.concat() 
 }
 
 enum Op {
@@ -105,7 +106,7 @@ mod tests {
         
         let mut s3 = Cin::new(String::from("3.14/(1+1.11)"));
 
-        let mut s4 = Cin::new(string2vec(String::from("   3.14  /(1+1.11)"))[0].clone());
+        let mut s4 = Cin::new(string_concatenate(String::from("   3.14  /(1+1.11)  + (1.1+2)")).clone());
 
         let mut s5 = Cin::new(String::from("3.14   +2.32)*2"));
 
@@ -117,10 +118,10 @@ mod tests {
     }
 
     #[test]
-    fn string2vec_works() {
-        let v = string2vec(String::from("    3.14   /(1+1.11)"));
+    fn string_concatenate_works() {
+        let v = string_concatenate(String::from("    3.14   /(1+1.11)"));
 
-        assert_eq!(vec![String::from("3.14"), String::from("/(1+1.11)")], v);
+        assert_eq!("3.14/(1+1.11)".to_string(), v);
     }
 
 }
