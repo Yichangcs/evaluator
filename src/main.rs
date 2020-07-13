@@ -16,18 +16,9 @@ fn string_concatenate(line: String) -> String {
     x.concat() 
 }
 
-enum Op {
-    LeftParen(char),
-    RightParen(char),
-    Add(char),
-    Sub(char),
-    Div(char),
-    Operand(f32),
-}
-
 
 struct Token {
-    kind: Op,
+    kind: char,
     value: f32,
 }
 
@@ -51,6 +42,16 @@ impl Cin {
         } else {
             panic!("nothing to putback");
         }
+    }
+
+    fn get(&mut self) -> char {
+        let i = self.index;
+        let mut ch = self.stream.chars().next();
+        while i > 0 {
+            ch = self.stream.chars().next();
+        }
+        self.index += 1;
+        return ch.unwrap();
     }
 
     fn cin2val(&mut self) -> f32 {
@@ -78,12 +79,55 @@ impl Cin {
     }
 
 }
+
 impl Token {
-    fn new(c: Op, v: f32) -> Token {
+    fn new(c: char, v: f32) -> Token {
         Token {
             kind: c,
             value: v,
         }
+    }
+}
+
+struct TokenStream {
+    full: bool,
+    buffer: Option<Token>,
+}
+
+impl TokenStream {
+    fn new() -> TokenStream {
+        TokenStream {
+            full: false,
+            buffer: None,
+        }
+    }
+
+    fn get(&mut self, cin: &mut Cin) -> Token {
+        if self.full {
+            self.full = false;
+            return self.buffer.take().unwrap();
+        } else {
+
+            let ch = cin.get();
+            match ch {
+                '('|')'|'+'|'-'|'*'|'/' => return Token::new(ch, 0.0),
+                '0'|'1'|'2'|'3'|'4'|'5'|'6'|'7'|'8'|'9' => {
+                    cin.putback();
+                    let val = cin.cin2val();
+                    return Token::new('8', val);
+                }
+                _ => panic!("wrong identifiers"),
+
+            }
+        }
+    }
+
+    fn putback(&mut self, t: Token) {
+        if self.full {
+            panic!("putback into a full buffer");
+        }
+        self.buffer = Some(t);
+        self.full = true; 
     }
 }
 
@@ -123,5 +167,12 @@ mod tests {
 
         assert_eq!("3.14/(1+1.11)".to_string(), v);
     }
-
+    
+    #[test]
+    fn Token_Stream_get_works() {
+       let s = string_concatenate(String::from("   3.14  / (1.1 + 2.2)"));
+       let mut cin = Cin::new(s);
+       let mut ts = TokenStream::new();
+       assert_eq!(ts.get(&mut cin).value, 3.14);
+    }
 }
