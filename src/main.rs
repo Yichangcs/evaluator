@@ -1,14 +1,76 @@
 use std::io; 
 
 
-fn main() -> io::Result<()> {
+fn main() {
+    let mut val = 0.0;
 
-    let mut line = String::new();
+    println!("please enter your expression for evaluate"); 
+    while true {
 
-    io::stdin().read_line(&mut line)?;
+        let mut line = String::new();
+
+        io::stdin().read_line(&mut line);
     
-    let v = string_concatenate(line);
-    Ok(())
+        let mut cin = Cin::new(string_concatenate(line));
+
+        let mut ts = TokenStream::new();
+
+        val = expression(&mut ts, &mut cin);
+
+        println!("=> {} ", val);        
+
+    }
+}
+
+fn expression(ts: &mut TokenStream, cin: &mut Cin) -> f32 {
+    let mut left = term(ts, cin);
+    let mut t = ts.get(cin);
+
+    while true {
+        match t.kind {
+            '+' => {left += term(ts, cin); t = ts.get(cin);},
+            '-' => {left -= term(ts, cin); t = ts.get(cin);},
+            _ =>  {ts.putback(t.clone()); return left;},
+        }
+    }
+    return left; 
+}
+
+fn term(ts: &mut TokenStream, cin: &mut Cin) -> f32 {
+    let mut left = primary(ts, cin);
+    let mut t = ts.get(cin);
+
+    while true {
+        match t.kind {
+            '*' => {left *= primary(ts, cin); t = ts.get(cin);}
+            '/' => {
+                let d = primary(ts, cin);
+                if d == 0.0 {
+                    panic!("divide by zero!");
+                }
+                left /= d;
+                t = ts.get(cin);
+            },
+            _  => {ts.putback(t.clone()); return left;},
+        } 
+    }
+    return left;
+}
+
+fn primary(ts: &mut TokenStream, cin: &mut Cin) -> f32 {
+    let mut t = ts.get(cin);
+    match t.kind {
+        '(' => {
+            let d = expression(ts, cin);
+            t = ts.get(cin);
+            if t.kind != ')' {
+                panic!("')' expected!");
+            }
+            return d;
+        },
+        '8' => return t.value,
+        _ => panic!("primary expected"),
+    }
 }
 
 fn string_concatenate(line: String) -> String {
@@ -85,6 +147,13 @@ impl Token {
         Token {
             kind: c,
             value: v,
+        }
+    }
+    
+    fn clone(&self) -> Token {
+        Token {
+            kind: self.kind,
+            value: self.value,
         }
     }
 }
@@ -170,9 +239,33 @@ mod tests {
     
     #[test]
     fn Token_Stream_get_works() {
-       let s = string_concatenate(String::from("   3.14  / (1.1 + 2.2)"));
-       let mut cin = Cin::new(s);
+       let s1 = string_concatenate(String::from("   3.14  / (1.1 + 2.2)"));
+       let s2 = string_concatenate(String::from("   (1+1)"));
+       let mut cin1 = Cin::new(s1);
+       let mut cin2 = Cin::new(s2);
        let mut ts = TokenStream::new();
-       assert_eq!(ts.get(&mut cin).value, 3.14);
+       assert_eq!(ts.get(&mut cin1).value, 3.14);
+       assert_eq!(ts.get(&mut cin2).kind, '(');
     }
+
+    #[test]
+    fn primary_works() {
+        let s1 = string_concatenate(String::from("   3.14"));
+        let mut cin1 = Cin::new(s1);        
+        let mut ts = TokenStream::new();
+        assert_eq!(primary(&mut ts, &mut cin1), 3.14);
+    }
+    
+    #[test]
+    fn term_works() {
+        let s1 = string_concatenate(String::from("   2.0 * 3.0 / 2.0 * 1.2"));
+        let mut cin1 = Cin::new(s1);
+        let mut ts = TokenStream::new();
+        assert_eq!(term(&mut ts, &mut cin1), 3.6);
+    }
+    
+    //#[test]
+    fn expression_works() {
+        let mut ts = TokenStream::new();
+    } 
 }
