@@ -5,7 +5,7 @@ fn main() {
     let mut val = 0.0;
 
     println!("please enter your expression for evaluate"); 
-    while true {
+    loop {
 
         let mut line = String::new();
 
@@ -26,21 +26,20 @@ fn expression(ts: &mut TokenStream, cin: &mut Cin) -> f32 {
     let mut left = term(ts, cin);
     let mut t = ts.get(cin);
 
-    while true {
+    loop {
         match t.kind {
             '+' => {left += term(ts, cin); t = ts.get(cin);},
             '-' => {left -= term(ts, cin); t = ts.get(cin);},
             _ =>  {ts.putback(t.clone()); return left;},
         }
     }
-    return left; 
 }
 
 fn term(ts: &mut TokenStream, cin: &mut Cin) -> f32 {
     let mut left = primary(ts, cin);
     let mut t = ts.get(cin);
 
-    while true {
+    loop {
         match t.kind {
             '*' => {left *= primary(ts, cin); t = ts.get(cin);}
             '/' => {
@@ -54,7 +53,6 @@ fn term(ts: &mut TokenStream, cin: &mut Cin) -> f32 {
             _  => {ts.putback(t.clone()); return left;},
         } 
     }
-    return left;
 }
 
 fn primary(ts: &mut TokenStream, cin: &mut Cin) -> f32 {
@@ -238,7 +236,7 @@ mod tests {
     }
     
     #[test]
-    fn Token_Stream_get_works() {
+    fn token_stream_get_works() {
        let s1 = string_concatenate(String::from("   3.14  / (1.1 + 2.2)"));
        let s2 = string_concatenate(String::from("   (1+1)"));
        let mut cin1 = Cin::new(s1);
