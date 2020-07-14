@@ -25,45 +25,45 @@ fn main() {
     }
 }
 
-fn expression(ts: &mut TokenStream, cin: &mut Cin) -> f32 {
-    let mut left = term(ts, cin);
-    let mut t = ts.get(cin);
+fn expression(mut ts: &mut TokenStream, mut cin: &mut Cin) -> f32 {
+    let mut left = term(&mut ts, &mut cin);
+    let mut t = ts.get(&mut cin);
 
     loop {
         match t.kind {
-            '+' => {left += term(ts, cin); t = ts.get(cin);},
-            '-' => {left -= term(ts, cin); t = ts.get(cin);},
+            '+' => {left += term(&mut ts, &mut cin); t = ts.get(&mut cin);},
+            '-' => {left -= term(&mut ts, &mut cin); t = ts.get(&mut cin);},
             _ =>  {ts.putback(t.clone()); return left;},
         }
     }
 }
 
-fn term(ts: &mut TokenStream, cin: &mut Cin) -> f32 {
-    let mut left = primary(ts, cin);
-    let mut t = ts.get(cin);
+fn term(mut ts: &mut TokenStream, mut cin: &mut Cin) -> f32 {
+    let mut left = primary(&mut ts, &mut cin);
+    let mut t = ts.get(&mut cin);
 
     loop {
         match t.kind {
-            '*' => {left *= primary(ts, cin); t = ts.get(cin);}
+            '*' => {left *= primary(&mut ts, &mut cin); t = ts.get(&mut cin);}
             '/' => {
-                let d = primary(ts, cin);
+                let d = primary(&mut ts, &mut cin);
                 if d == 0.0 {
                     panic!("divide by zero!");
                 }
                 left /= d;
-                t = ts.get(cin);
+                t = ts.get(&mut cin);
             },
             _  => {ts.putback(t.clone()); return left;},
         } 
     }
 }
 
-fn primary(ts: &mut TokenStream, cin: &mut Cin) -> f32 {
-    let mut t = ts.get(cin);
+fn primary(mut ts: &mut TokenStream, mut cin: &mut Cin) -> f32 {
+    let mut t = ts.get(&mut cin);
     match t.kind {
         '(' => {
-            let d = expression(ts, cin);
-            t = ts.get(cin);
+            let d = expression(&mut ts, &mut cin);
+            t = ts.get(&mut cin);
             if t.kind != ')' {
                 panic!("')' expected!");
             }
@@ -296,7 +296,7 @@ mod tests {
         assert_eq!(primary(&mut ts, &mut cin1), 3.14);
     }
     
-    //#[test]
+    #[test]
     fn term_works() {
         let s1 = string_concatenate(String::from("   2.0 * 3.0 / 2.0 * 1.2"));
         let mut cin1 = Cin::new(s1);
