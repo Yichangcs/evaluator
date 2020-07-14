@@ -239,11 +239,24 @@ mod tests {
     fn token_stream_get_works() {
        let s1 = string_concatenate(String::from("   3.14  / (1.1 + 2.2)"));
        let s2 = string_concatenate(String::from("   (1+1)"));
+       let s3 = string_concatenate(String::from("*3.14-2"));
+       let mut cin3 = Cin::new(s3);
        let mut cin1 = Cin::new(s1);
        let mut cin2 = Cin::new(s2);
        let mut ts = TokenStream::new();
        assert_eq!(ts.get(&mut cin1).value, 3.14);
        assert_eq!(ts.get(&mut cin2).kind, '(');
+       assert_eq!(ts.get(&mut cin3).kind, '*');
+    }
+    
+    #[test]
+    fn token_stream_putback_works() {
+        let mut ts = TokenStream::new();
+        ts.putback(Token::new('/', 0.0));
+        let s1 = string_concatenate(String::from("   3.14  / (1.1 + 2.2)"));
+        let mut cin1 = Cin::new(s1);
+        assert_eq!(ts.get(&mut cin1).kind, '/');
+        assert_eq!(ts.get(&mut cin1).kind, '8');
     }
 
     #[test]
@@ -254,12 +267,16 @@ mod tests {
         assert_eq!(primary(&mut ts, &mut cin1), 3.14);
     }
     
-    #[test]
+    //#[test]
     fn term_works() {
         let s1 = string_concatenate(String::from("   2.0 * 3.0 / 2.0 * 1.2"));
         let mut cin1 = Cin::new(s1);
-        let mut ts = TokenStream::new();
-        assert_eq!(term(&mut ts, &mut cin1), 3.6);
+        let mut ts1 = TokenStream::new();
+        assert_eq!(term(&mut ts1, &mut cin1), 3.6);
+        let s2 = string_concatenate(String::from("3.12+2.0*3.0-1.1/2.2"));
+        let mut cin2 = Cin::new(s2);
+        let mut ts2 = TokenStream::new();
+        assert_eq!(term(&mut ts2, &mut cin2), 3.12);
     }
     
     //#[test]
