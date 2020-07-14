@@ -5,20 +5,23 @@ fn main() {
     let mut val = 0.0;
 
     println!("please enter your expression for evaluate"); 
-    loop {
+    let mut line = String::new();
 
-        let mut line = String::new();
-
-        io::stdin().read_line(&mut line);
+    io::stdin().read_line(&mut line);
     
-        let mut cin = Cin::new(string_concatenate(line));
+    let mut cin = Cin::new(string_concatenate(line));
 
-        let mut ts = TokenStream::new();
+    let mut ts = TokenStream::new();
+   
+    while !cin.end(){
+        let t = ts.get(&mut cin);
 
+        if t.kind == ';' {
+            println!("=>{}", val);
+        } else {
+            ts.putback(t.clone());
+        } 
         val = expression(&mut ts, &mut cin);
-
-        println!("=> {} ", val);        
-
     }
 }
 
@@ -105,13 +108,24 @@ impl Cin {
     }
 
     fn get(&mut self) -> char {
-        let i = self.index;
-        let mut ch = self.stream.chars().next();
-        while i > 0 {
-            ch = self.stream.chars().next();
+        if !self.end()
+        {
+            let mut iter = self.stream.chars();
+            let mut ch = iter.next();
+            let mut i = self.index;
+            while i > 0 {
+                ch = iter.next();
+                i -= 1;
+            }
+            self.index += 1;
+            return ch.unwrap();
+        } else {
+            panic!("end of cin!");
         }
-        self.index += 1;
-        return ch.unwrap();
+    }
+    
+    fn end(&self) -> bool {
+        self.index == self.stream.chars().count()
     }
 
     fn cin2val(&mut self) -> f32 {
@@ -207,6 +221,21 @@ mod tests {
     #[test]
     fn it_works() {
         assert_eq!(2+2, 4);
+    }
+
+    #[test]
+    fn cin_end_works() {
+        let mut cin = Cin::new(String::from("foo"));
+        cin.index = 3;
+        assert_eq!(cin.end(), true); 
+    }
+
+    #[test]
+    fn cin_get_works() {
+        let mut cin = Cin::new(String::from("foo"));
+        assert_eq!(cin.get(), 'f');
+        assert_eq!(cin.get(), 'o');
+        //assert_eq!(cin.get(), 'o');
     }
     
     #[test]
