@@ -2,26 +2,21 @@ use std::io;
 
 
 fn main() {
-    let mut val = 0.0;
+    loop {
+        let mut val = 0.0;
 
-    println!("please enter your expression for evaluate"); 
-    let mut line = String::new();
+        println!("please enter your expression for evaluate: "); 
+        let mut line = String::new();
 
-    io::stdin().read_line(&mut line);
+        io::stdin().read_line(&mut line);
     
-    let mut cin = Cin::new(string_concatenate(line));
+        let mut cin = Cin::new(string_concatenate(line));
 
-    let mut ts = TokenStream::new();
+        let mut ts = TokenStream::new();
    
-    while !cin.end(){
-        let t = ts.get(&mut cin);
-
-        if t.kind == ';' {
-            println!("=>{}", val);
-        } else {
-            ts.putback(t.clone());
-        } 
         val = expression(&mut ts, &mut cin);
+
+        println!("=> {}", val);
     }
 }
 
@@ -190,7 +185,7 @@ impl TokenStream {
         } else {
             let ch = cin.get();
             match ch {
-                '('|')'|'+'|'-'|'*'|'/' => return Token::new(ch, 0.0),
+                '('|')'|'+'|'-'|'*'|'/'|';'|'q' => return Token::new(ch, 0.0),
                 '0'|'1'|'2'|'3'|'4'|'5'|'6'|'7'|'8'|'9' => {
                     cin.putback();
                     let val = cin.cin2val();
@@ -306,9 +301,9 @@ mod tests {
         assert_eq!(primary(&mut ts, &mut cin1), 3.14);
     }
     
-    //#[test]
+    #[test]
     fn term_works() {
-        let s1 = string_concatenate(String::from("   2.0 * 3.0"));
+        let s1 = string_concatenate(String::from("   2.0 * 3.0+(1.0+3.0)"));
         let mut cin1 = Cin::new(s1);
         let mut ts1 = TokenStream::new();
         assert_eq!(term(&mut ts1, &mut cin1), 6.0);
@@ -316,10 +311,37 @@ mod tests {
         let mut cin2 = Cin::new(s2);
         let mut ts2 = TokenStream::new();
         assert_eq!(term(&mut ts2, &mut cin2), 3.12);
+        let s3 = string_concatenate(String::from(" 3.0 * 2.0;"));
+        let mut cin3 = Cin::new(s3);
+        let mut ts3 = TokenStream::new();
+        assert_eq!(term(&mut ts3, &mut cin3), 6.0);
+        let s4 = string_concatenate(String::from("3.0/  1.5 + 2.0"));
+        let mut cin4 = Cin::new(s4);
+        let mut ts4 = TokenStream::new();
+        assert_eq!(term(&mut ts4, &mut cin4), 2.0);
+        let s5 = string_concatenate(String::from("3.0;"));
+        let mut cin5 = Cin::new(s5);
+        let mut ts5 = TokenStream::new();
+        assert_eq!(term(&mut ts5, &mut cin5), 3.0);
     }
     
-    //#[test]
+    #[test]
     fn expression_works() {
-        let mut ts = TokenStream::new();
+        let s1 = string_concatenate(String::from("  2.0 * 3.0 +(2.0+3.0) / 2.5;"));
+        let mut cin1 = Cin::new(s1);
+        let mut ts1 = TokenStream::new();
+        assert_eq!(expression(&mut ts1, &mut cin1), 8.0);
+        let s2 = string_concatenate(String::from("(2.0);"));
+        let mut cin2 = Cin::new(s2);
+        let mut ts2 = TokenStream::new();
+        assert_eq!(expression(&mut ts2, &mut cin2), 2.0);
+        let s3 = string_concatenate(String::from(" 3.0;"));
+        let mut cin3 = Cin::new(s3);
+        let mut ts3 = TokenStream::new();
+        assert_eq!(expression(&mut ts3, &mut cin3), 3.0);
+        let s4 = string_concatenate(String::from("((1.0+ 2.0) * 3.0 - (3.0 +4.0) /3.5);"));
+        let mut cin4 = Cin::new(s4);
+        let mut ts4 = TokenStream::new();
+        assert_eq!(expression(&mut ts4, &mut cin4), 7.0); 
     } 
 }
