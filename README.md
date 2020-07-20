@@ -8,7 +8,11 @@ This evaluator consists of a Tokenizer, a Parser based on a grammar tree as belo
 ![grammar%20tree](https://github.com/Yichangcs/evaluator/blob/master/grammar%20tree.jpg)
 
 ## How to use
+
 enter a line os arithmetical expression:
+
 ((3.0 + 2.0) * 4.0 - 6.0)
+
 this evaluator returns a result:
+
 => 14.0
