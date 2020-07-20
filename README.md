@@ -5,5 +5,4 @@ A evaluator for a line of arithmetical expression is implemented in Rust which i
 ## evaluator structure
 This evaluator consists of a Tokenizer, a Parser based on a grammar tree as below.
 
-![image]
-(https://github.com/Yichangcs/evaluator/blob/master/grammar%20tree.jpg)
+![grammar%20tree](https://github.com/Yichangcs/evaluator/blob/master/grammar%20tree.jpg)
