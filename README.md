@@ -9,7 +9,7 @@ This evaluator consists of a Tokenizer, a Parser based on a grammar tree as belo
 
 ## How to use
 
-enter a line os arithmetical expression(note that a ';' is necessary to be attached at the end to denote the end of expression ):
+enter a line of arithmetical expression(note that a ';' is necessary to be attached at the end to denote the end of expression ):
 
 ((3.0 + 2.0) * 4.0 - 6.0);
 
