@@ -1,7 +1,7 @@
 # evaluator
 ## Introduction
 This is a tiny learning project for Rust language.
-A evaluator for a line of arithmetical expression is implemented in Rust which is inspired by Stroustrup's book “Programming-Principles and Practice Using C++”, chapter 6.
+A evaluator for a line of arithmetical expression is implemented in Rust which is inspired by Stroustrup's book “Programming-Principles and Practice Using C++”[1], chapter 6.
 ## evaluator structure
 This evaluator consists of a Tokenizer, a Parser based on a grammar tree as below.
 
@@ -16,3 +16,5 @@ enter a line of arithmetical expression(note that a ';' is necessary to be attac
 this evaluator returns a result:
 
 => 14.0
+
+[1] https://www.stroustrup.com/programming.html
